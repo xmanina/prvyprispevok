@@ -1,0 +1,257 @@
+\documentclass[a4paper]{llncs}
+\setlength{\hoffset}{-0.01cm} 
+\setlength{\voffset}{-0.01cm}
+\setlength{\textheight}{21.0cm} 
+\setlength{\textwidth}{12.2cm}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{commath}
+\begin{document}
+
+\title
+{Software Developer Activity as a Source for Identifying\\ Hidden Source Code Dependencies}  
+
+\author{Martin Kon\^opka, M\'aria Bielikov\'a}
+
+\institute{Slovak University of Technology,\\
+Faculty of Informatics and Information Technologies, \\
+Ilkovi\v{c}ova 2, 842 16 Bratislava, Slovakia,\\
+\{martin\_konopka, maria.bielikova@stuba.sk\}} 
+\maketitle
+
+\begin{abstract}
+Connections between source code components are important to know in the whole software life. Traditionally, we use syntactic analysis to identify source code dependencies which may not be sufficient in cases of dynamically typed programming languages, loosely coupled components or when multiple programming languages are combined. We aim at using developer activity as a source for identifying implicit source code dependencies, to enrich or supplement explicitly stated dependencies in the source code. We propose a method for iden- tification of implicit dependencies from activity logs in IDE, mainly of switching between source code files in addition to usually used logs of copy-pasting code fragments and commits. We experimentally evaluated our method using data of students’ activity working on five projects. We compared implicit dependencies with explicit ones including manual evaluation of their significance. Our results show that implicit dependencies based on developer activity partially reflect ex- plicit dependencies and so may supplement them in cases of their unavailability. In addition, implicit dependencies extend existing dependency graph with new significant connections applicable in software development and maintenance.
+        
+\smallskip
+\noindent 
+\textbf{\\Keywords.} software component, dependency, source code, developer activity, dependency graph, implicit dependency, implicit feedback
+
+\end{abstract}
+
+\section{Introduction}
+Source code dependencies traditionally reflect explicit statements in the source code and are identified with syntactic analysis of source code contents. As a dependency we understand oriented connection between two source code components of selected gran- ularity, namely instance or type reference, inheritance relationship or call reference.
+
+Identified dependencies are used to form a dependency matrix or an oriented graph of interconnected software components to study organization and hierarchy of software components and their attributes [7]. Dependencies are also sourced for identifying prob- lematic places, possibly code smells and complexity of the web of software compo- nents, which is important for maintenance activities on evolving software in particular.
+
+Source code dependencies allow software developers to learn about how the existing source code works and how it is composed, e.g., how it will be affected by an introduced 
+                                     %nova strana
+\newpage \noindent 
+change or how much effort will be required for refactoring. Both adding new function- ality and changing existing functionality require developers to know about the depend- encies before making a change in the source code.
+
+Traditional approaches use a syntactic analysis for identifying source code depend- encies. Other approach is to employ developer activity as a source for identifying source code dependencies, but mostly logs of copy-pasting code fragments and commits to identify hidden dependencies in source code are used. We propose a method for iden- tification of source code dependencies that extends existing works with utilizing data of developer’s navigation in source code space (logs of switching between source code components). Based on the source for identification, we distinguish identified source code dependencies as implicit, i.e., identified from developer activity as an implicit feedback related to the source code, in addition to the traditional \textit{explicit}~dependencies reflecting explicit statements in the source code. With our method we broaden~the~space of known source code dependencies, thus extending a dependency graph with new edges relevant for the development or other evaluations of the source code.
+
+For the identification of the implicit source code dependencies we use developer
+activity~recorded in an integrated development environment (IDE) and commit logs from~a~revision control system (RCS) [14]. Our work is inspired by the research project PerConIK  --- Personalized Conveying of Information and~Knowledge~(per - 
+
+\noindent conik.fiit.stuba.sk) [2] with its goal to bring new software metrics based on evaluating data of developer activity and context of software development. Infrastructure of this project [3] provides us with data collected in software house and university environ- ment (student team projects), which we use for evaluation of our method.
+
+\section{Related Work}
+
+Software product and its source code result from software developer activity. This mo- tivates current research to look for how software attributes (mostly maintainability) [4] are affected by activities performed during the development together with the context which developers had resided in. Developers are often disrupted at work, switch be- tween multiple tasks or take over another developer’s task. Because of that, various tools for navigation in the source code were proposed, notably dependency graph of software components [7] and task-related tools, e.g., for source code and developer recommendation [1], [6], [13].
+
+We may infer programming sessions [6] from developer activity monitored during the software development and use them to describe tasks which developers had worked on with task contexts [1], [15], i.e., source code artifacts relevant to the currently solved task by developer. Developers visit places in the source code related to the task more often during the work on that particular task [4], [8]. From the recorded data we may then reconstruct what the developer was working on [6], [13] or what particular devel- oper specializes in [11].
+
+There are multiple sources and types of data that we can gather when monitoring developers during the processes of software development [14], for example: source code files and their contents from source code repositories [13]; development tasks
+                                     %nova strana
+\newpage \noindent 
+from issue tracking systems; developer activity in an IDE [1], [3], [7]; developer activ- ity outside of an IDE, in operating system or even events in real life.
+
+It is important to not affect monitored developers during their activities [8], being it a similar problem of gathering implicit feedback on the Web [2]. Several issues arise in the design and development of the infrastructure for a system for gathering~men- tioned data of developer activity together – scalability and efficient processing online among them. One of the already proposed solutions is developed within the project PerConIK-Personalized Conveying of Information and Knowledge which considers software repository as a web of software components and applies “webification” of software development [2], [3], i.e., employing methods and techniques from Web en- gineering to identify new information about software development and propose new software metrics. 
+
+Traditional source code metrics rely on a syntactic analysis of source code, omitting the information from development process. Basic example is the \textit{lines of code} metric which evaluates the size of source code but not the time spent working on the measured source code. Similarly, traditional dependency graph of software components is created with identified references of source code components [7], helping developers with soft- ware development and maintenance. Authors in [17] also successfully applied network algorithms on identified dependencies to predict problems in software design.
+
+Dependencies identified with syntactic analysis of source code are explicit since they reflect explicit statements in the source code [7]. We identify following main problems of the explicit dependencies and of their identification:
+
+\begin{itemize}
+\renewcommand{\labelitemi}{$\bullet$}
+\item  
+Explicit dependencies do not capture cross-language connections in source code,~e.g. in Web projects developed in combination of HTML and C\# language. 
+\item
+Explicit dependencies do not capture connections with configuration files, schema template files or runtime dependencies.
+\item
+Syntactic analysis of source code is not trivial or even possible for dynamically~typed languages, e.g., JavaScript, Ruby. 
+\item
+Explicit dependencies do not reflect sources of solutions in source code, developer's inspiration and places required to check when particular component is changed.
+\end{itemize}
+
+\noindent We see possibilities of employing developer activity as a source for identification of source code dependencies, inspired by the task context approaches [1], [6], [13]. Source code does not contain information about the developer’s intents, inspirations and deci- sions for implemented solutions, what may suitably extend existing dependency graph. Moreover, because developer activity is not language-dependent, we may identify de- pendencies across different programming languages and also dependencies with con- figuration files or others which are currently not covered by explicit dependencies.
+
+\section{Implicit Source Code Dependencies}
+
+Software developer interacts with source code components during the development and maintenance, and so implicitly reveals task-related dependencies hidden in the source code. Selected example situations are:
+                                        
+                                          %nova strana
+\newpage
+\renewcommand{\labelitemi}{$\bullet$}
+\begin{itemize}
+\item
+Developer studies existing code and navigates between dependent components, switches between them to understand implemented logic (navigation paths) [8].
+\item
+Developer implements functionality consisting of multiple components in parallel.
+\item
+Developer copy-pastes a code fragment from existing component – further changes
+of the original implementation may lead to inconsistency in source code [4].
+\item
+Developer configures source code components by creating or maintaining external
+configuration files.
+\end{itemize}
+
+\noindent In all these situations developer’s navigation and activity performed in the source code implicitly reveals dependent components. When we do not take into account contents of source code files, developer activity also reveals dependencies on configuration files or on components implemented in different programming language. The idea behind the implicit dependencies is similar to the identification of task contexts, i.e., the devel- oper works with software components that are related with each other for the task com- pletion, and is based on empirical observations of developer activity from two sources – activities recorded in an IDE, e.g., custom extension for Microsoft Visual Studio or Eclipse [3], and commit history in a RCS, e.g., Microsoft Team Foundation Server or Git [12]. We chose to use these low-level logs of activities with source code compo- nents from all available types of logs [14] provided by the project PerConIK [2]:
+
+\begin{itemize}
+\item
+navigation in the source code in an IDE -- open, close and switch-to a source code file -- time-related activities resulting in a change of currently opened file;
+\item
+copy-paste code fragment between two source code files; and
+\item
+commit (or check-in) of a collection of source code files to a RCS.
+\end{itemize}
+
+
+\noindent Although we do not force choice of the granularity for source code components (e.g., line of code, method, class or library), but for our experiments and implementation we consider source code files as components.
+
+Our method (see Fig. 1) consists of steps for converting raw logs of developer activ- ity in an IDE and from a RCS to the format used by our method, continued by the identification of implicit dependencies, their weighting and validation and finally con- struction of a dependency graph.
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{/Users/Jakub13/Desktop/images/picture.png}
+\caption{Overview of method for identification of implicit source code dependencies.}
+\end{figure}
+
+\subsection{Identification of Implicit Dependencies}
+We define source code dependencies as oriented connections between pairs of software components. Dependencies are weighted according to their significance and, consider- ing software evolution, are valid for the particular time. Let S be the set of source code components of the selected granularity, then the space of dependencies in the source
+                                          %nova strana
+\newpage\noindent
+code is \textit{D=$S\times S\times T\times  R$} in the time \textit{T} with the weights \textit{R}. Note that the explicit de- pendencies are valid in time while explicit statements are present in the source code.
+
+Based on the types of activity logs used for identification of the implicit dependen- cies we define three specialized types of implicit dependencies \textit{$D_{imp}\subseteq D:$}
+
+\begin{itemize}
+\item time-related implicit dependencies \textit{$D_{imp,time,}$}
+\item content-related implicit dependencies \textit{$D_{imp,content,}$}
+\item commit-related implicit dependencies \textit{$D_{imp,commit}$.}
+\end{itemize}
+
+\noindent The most common activity performed by developer during the development is the nav-igation in the source code space. Ttime-related activities with source code components in an IDE are described with the tuples \textit{(source, target, operation, timestamp)} contain- ing the \textit{source} and the \textit{target} component of the operation, \textit{type} of performed operation (e.g., open, close or switch-to file) and \textit{timestamp} when the activity occurred. We re-construct developer activity from these logs to create time-related implicit dependen- cies \textit{$d_{imp,time}$} (1) between the software components \textit{$s_{1}$} and \textit{$s_{2}$}, which occurred at~the~time \textit{t}, when developer spent time span in the target component (the \textit{time window} property) before making next operation. The weight \textit{w} is determined by the weighting function using the time window property.
+
+\begin{equation}
+d_{imp,time} = (s_{1},s_{2},t,w,time window)
+\label{vzorec1}
+\end{equation}
+
+\noindent Content-related activities of copying and pasting code are described with the tuples \textit{(target, code operation, content, timestamp)}, containing the \textit{target} component where the \textit{code operation} was performed (copy, cut or paste) with the code \textit{content}, and when the operation happened. Final copy-paste operation is logged with at least two actions, i.e., copying the code from the source code component \textit{X} and pasting it into the source code component \textit{Y}. Because of that we reconstruct the clipboard stack to identify con- tent-related implicit dependencies \textit{$d_{imp,content}$} (2) where the \textit{content} property contains the copy-pasted code fragment and may be used for determining the weight \textit{w}.
+
+\begin{equation}
+d_{imp,content} = (s_{1},s_{2},t,w,content)
+\label{vzorec2}
+\end{equation}
+
+\noindent The last type of implicit dependencies are identified from commit operations. Devel-opers tend to submit changes in a collection of source code components as a solution for the particular task, thus the changed components are implicitly connected with each other. For each pair of the changed components \textit{($s_{1},s_{2}$)} in the same commit we create dependency \textit{$d_{imp,commit}$} (3) with \textit{total count} of all committed components~and~weight~\textit{w}.
+ 
+ \begin{equation}
+ d_{imp,commit} = (s_{1},s_{2},t,w,total count)
+ \label{vzorec3}
+ \end{equation}
+ 
+ \subsection{Weighting of Implicit Dependencies}
+ Each specialized type of implicit dependency extends general \textit{$D_{imp}$} with extra property, being it \textit{time window, content} or \textit{count}. We use these properties to determine the sig- nificance of dependencies with the weighting function \textit{weight} differently for each spe- cialized type (4), ranging from insignificant to fully significant dependency.
+ 
+ \newpage
+ \begin{equation}
+ weight : D_{imp}\rightarrow\langle0,1\rangle
+ \label{vzorec4}
+ \end{equation}
+ 
+\noindent Time-related implicit dependencies are weighted according to the time spent in the vis- ited component, i.e., significance of visiting (opening, switching-to) that component for the developer. The weighting function may be specified for the particular implementa- tion. In our case we chose the weighting function to be as shown in Fig. 2. To eliminate mistakes in developer’s navigation in source code space, the dependency becomes fully significant after the selected threshold a. But after the threshold b the dependency is becoming irrelevant (the threshold \textit{c}). After experiments we chose the thresholds to be \textit{a = 10 seconds, b = 10 minutes} and \textit{c = 15 minutes} for our method.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{/Users/Jakub13/Desktop/images/graf.png}
+
+\caption{The weighting function for time-related implicit dependencies \textit{$d_{imp,time}$} with threshold parameters \textit{a, b} and \textit{c}.}
+\end{figure}
+
+\noindent Content-related implicit dependencies are identified from the copy-paste operations, thus their significance may correspond to the amount of the code copied or its contents. However, for simplicity we chose to weight every \textit{$d_{imp,content}$} with constant of \textit{1}.
+
+Commit-related implicit dependencies are weighted to the total count of committed components, as in (5), to promote smaller, fine-grained, commits solving single tasks. The lower the count of changed components in a commit, the more dependent they are together and contrariwise.
+
+ \begin{equation}
+ weight(d_{imp,commit}) = \dfrac{1}{count} 
+ \label{vzorec5}
+ \end{equation}
+ 
+ \subsection{Validation of Implicit Dependencies}
+ Even though changes in the source code invoke changes of its explicit dependencies, we are not able to similarly validate implicit dependencies over time. To model their relevance we validate them to the selected time using a forgetting function [9]. Devel- oper interacts with the source code components mostly based on the task they currently solve, thus when the contents change over time or the task is finished, the developer’s interactions lose their significance. Because of that the definition for validation func-tions of implicit dependencies \textit{$d_{imp}$} (6) is similar to of explicit dependencies \textit{$d_{exp}$} (7).
+                                       %nova strana
+ \newpage
+ 
+ \begin{equation}
+ validity_{imp}: D_{imp}\times T\rightarrow\langle0,1\rangle 
+ \label{vzorec6}
+ \end{equation}
+ \begin{equation}
+ validity_{exp}: D_{iexp}\times T\rightarrow\lbrace0,1\rbrace
+ \label{vzorec7} 
+ \end{equation}
+ 
+ \noindent Explicit dependencies are valid or not according to existence of explicit statements to the selected time, hence the validity selected to 0 or 1. Implicit dependencies are valid according to the forgetting function to the selected time \textit{t} (8), which we chose to use from [16] with parameters set to \textit{a} = 1 and \textit{b} = 0.08:
+ 
+ \begin{equation}
+ y = ae^{(-b\sqrt{t})}
+ \end{equation}
+ 
+ \subsection{Dependency Graph}
+ After the identification of implicit dependencies, we extend existing dependency graph \textit{G(V,E)} of \textit{V} for the vertices of software components (source code files), and \textit{E} for edges of aggregated dependencies. We differentiate between explicit and implicit edges in the graph because of differences in their meaning, i.e., \textit{$E=E_{exp}\cup E_{imp}$}: 
+ 
+ \begin{itemize}
+ \item 
+ Explicit dependencies represent statements in the source code, e.g., references, call hierarchy, inheritance.
+ \item 
+ Implicit dependencies represent how developers interacted with source code during the development, e.g., their inspirations.
+ \end{itemize}
+ 
+ \noindent
+ Both explicit and implicit edges of dependency graph are weighted with sum of weights of aggregated explicit or implicit dependencies of the corresponding type (9), possibly validated to the selected time. Resulting weight of implicit edge represents significance of aggregated implicit dependencies over time with single value.
+ 
+ \begin{equation}
+ weight(e_{imp,s_{1},s_{2}}) = \Sigma_{d_{imp}\in D_{imp,s_{1},s_{2}}} validity(d_{imp}) w
+ \end{equation}
+ 
+ \section{Evaluation}
+ We propose implicit source code dependencies to be mainly applied during the pro- cesses of development and maintenance. To evaluate contribution of implicit depend- encies we performed two experiments to show that:
+ 
+ \begin{itemize}
+ \item
+ implicit dependencies reflect explicit dependencies of components which developer worked on during the task,
+ \item
+ implicit dependencies enrich dependency graph with new significant connections usable during the maintenance.
+ \end{itemize}
+ 
+\noindent
+The PerConIK project is developed in cooperation with a medium sized software com- pany. Before deploying our method in real work environment, we opted for evaluating it using data of five on-going student software projects provided also by the PerConIK project. These projects were developed by students of master courses Software Engi- neering or Information Systems. All projects were developed in C\#/.NET and other Microsoft technologies in time span of one academic year:
+                                      %nova strana  
+ \newpage
+ \begin{itemize}
+ \item
+ \textit{Project A} -- development of a web/desktop application by 3 developers,
+  \item
+ \textit{Project B} -- development of class libraries by 1 developer,
+  \item
+ \textit{Project C} -- development of class libraries by 1 developer,
+  \item
+ \textit{Project D} -- development of a web/desktop application by the team of 7 developers,
+  \item
+ \textit{Project E} -- development of a web application by the team of 7 developers.
+\end{itemize}
+
+\noindent
+Table 1 shows total numbers of activity logs from these projects, total number of ex- plicit edges in their dependency graphs and also results of the selected source code metrics -- \textit{lines of code, maintainability index} and \textit{cyclomatic complexity}. In our eval- uation we use source code files for components used in the method. Because all the evaluated projects were developed using Microsoft technologies, we employed the %nieco ako to dat do dalsieho riadka %  Code Map  functionality of Microsoft Visual Studio to identify explicit dependencies using the built-in reference recognition and the Code Metrics to evaluate other metrics.
+%nieco ako to dat do dalsieho riadka % 
+ 
+ \subsection{Reflection of Explicit Dependencies}
+ We expect that implicit dependencies reflect explicit ones based on the existence of the developer’s task context. We compared existing explicit dependencies of evaluated pro- jects with identified implicit dependencies by comparing the \textit{$E_{exp}$} and \textit{$E_{imp}$} sets of de- pendency graphs. Table 2 shows total numbers of identified implicit edges in depend- ency graphs constrained by threshold for edge weights ranging from 0 to 3, when con- sidering only edges between the files that appear in the explicit dependency graphs.
+
+ 
+
+
+\end{document}
